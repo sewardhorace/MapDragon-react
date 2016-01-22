@@ -1,11 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var App = React.createClass({
-  render: function() {
-    return <div>Hello {this.props.name}</div>;
-  }
-});
+var App = require('./components/App');
 
-var mountNode = document.getElementById("root");
-ReactDOM.render(<App name="Coolio"/>, mountNode);
+ReactDOM.render(<App name="Jesus Monster"/>, document.getElementById("root"));

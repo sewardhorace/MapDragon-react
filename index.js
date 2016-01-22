@@ -3,7 +3,7 @@ var express = require('express');
 
 var app = express();
 
-app.use('/static', express.static(__dirname + '/src/public'));
+app.use('/static', express.static(__dirname + '/src/dist'));
 
 app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));

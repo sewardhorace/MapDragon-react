@@ -6,7 +6,7 @@ var babelify = require('babelify');
 var watchify = require('watchify');
 
 var scriptsDir = './src/scripts/';
-var buildDir = './src/public/scripts/';
+var buildDir = './src/dist/scripts/';
 
 function buildScript(entryFile, watch) {
   var props = {
