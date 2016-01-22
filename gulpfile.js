@@ -2,37 +2,40 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var source = require('vinyl-source-stream');
 var browserify = require('browserify');
+var babelify = require('babelify');
+var watchify = require('watchify');
 
+var scriptsDir = './src/scripts/';
+var buildDir = './src/public/scripts/';
 
-//run this task from the terminal with 'gulp scripts'/'gulp' (for 'default')
+function buildScript(entryFile, watch) {
+  var props = {
+		entries: [scriptsDir + entryFile],
+		debug: true,
+    cache: {},
+    packageCache: {},
+	};
+  var bundler = watch ? watchify(browserify(props)) : browserify(props);
+  bundler.transform(babelify, {presets: ["react"]});
+  function rebundle() {
+    var stream = bundler.bundle();
+    return stream.on('error', function(e){
+			gutil.log(e);
+		})
+    .pipe(source('bundle.js'))
+    .pipe(gulp.dest(buildDir));
+  }
+  bundler.on('update', function() {
+    rebundle();
+    gutil.log('Rebundle...');
+  });
+  return rebundle();
+}
+
+gulp.task('build', function() {
+	return buildScript('main.js', false);
+});
+
 gulp.task('default', function() {
-	//source: files that should be affected by the task
-  return gulp.src('src/scripts/*.js')
-	// .pipe('do something here')
-	//concatenate all the js files into one called bundle.js
-	.pipe(concat('bundle.js'))
-	//dest: destination where the modified/transformed files will be output
-	.pipe(gulp.dest('dist'));
-});
-
-gulp.task('browserify', function() {
-	//entry point for browserify (will recursively include modules 'require'd by this file)
-	browserify('./src/index.js')
-	//concatenates all included modules
-	.transform()
-	.bundle()
-	//logs error (if any) using gulp util
-	.on('error', function(e){
-		gutil.log(e);
-	})
-	//name of concatenated file that is produced.
-	//vinyl-source-stream is used here to output the bundle to gulps pipe stream
-	.pipe(source('bundle.js'))
-	//destination directory of the file
-	.pipe(gulp.dest(''))
-});
-
-gulp.task('watch', function() {
-	//if any of the given files are changed, run the task(s) in the given array
-	gulp.watch('src/scripts/*.js', ['default']);
+	return buildScript('main.js', true);
 });
