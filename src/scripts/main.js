@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var App = require('./components/App');
+var MapDragon = require('./components/MapDragon');
 
-ReactDOM.render(<App name="Jesus Monster"/>, document.getElementById("root"));
+ReactDOM.render(<MapDragon />, document.getElementById("root"));
