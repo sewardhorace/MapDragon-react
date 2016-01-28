@@ -33,3 +33,5 @@ Steading.prototype.contains = function(mx, my) {
   return  (this.x <= mx) && (this.x + this.width >= mx) &&
           (this.y <= my) && (this.y + this.width >= my);
 }
+
+module.exports = Steading;

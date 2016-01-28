@@ -3,8 +3,6 @@ var ReactDOM = require('react-dom');
 
 var Popup = React.createClass({
   getInitialState: function(){
-    var spriteSheet = new Image();
-    spriteSheet.src = 'static/assets/images/cowboyspritestrip.png';
     return {
       options:[],
       selectedOptionIdx: -1,
@@ -34,6 +32,12 @@ var Popup = React.createClass({
       visible: false
     });
   },
+  addSteadingButtonClicked: function(){
+    console.log(this.refs.steadingNameInput.value);
+  },
+  cancelButtonClicked: function(){
+    this.hide();
+  },
   render: function() {
     var popupStyle = {
       left: this.state.x,
@@ -44,8 +48,8 @@ var Popup = React.createClass({
         <div id="popup" style={popupStyle}>
           <div className="popup-nav">
             <input ref="steadingNameInput" className="nav-title nav-left" placeholder="Title (optional)"/>
-            <div className="nav-item nav-right">x</div>
-            <div className="nav-item nav-right">+</div>
+            <div onClick={this.cancelButtonClicked} className="nav-item nav-right">x</div>
+            <div onClick={this.addSteadingButtonClicked} className="nav-item nav-right">+</div>
           </div>
           <div className="popup-window">
             <ul className="popup-options">

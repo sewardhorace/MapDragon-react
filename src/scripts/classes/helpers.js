@@ -1,4 +1,4 @@
-relativeMousePos = function(e){
+var relativeMousePos = function(e){
   var mousePosDoc = {
     x: e.pageX,
     y: e.pageY
@@ -17,6 +17,20 @@ relativeMousePos = function(e){
 	};
 };
 
+
+var SetIntervalMixin = {
+  componentWillMount: function() {
+    this.intervals = [];
+  },
+  setInterval: function() {
+    this.intervals.push(setInterval.apply(null, arguments));
+  },
+  componentWillUnmount: function() {
+    this.intervals.forEach(clearInterval);
+  }
+};
+
 module.exports = {
-  relativeMousePos: relativeMousePos
+  relativeMousePos: relativeMousePos,
+  SetIntervalMixin: SetIntervalMixin
 };
