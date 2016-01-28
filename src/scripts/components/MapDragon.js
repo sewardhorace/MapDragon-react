@@ -1,3 +1,4 @@
+//TODO lots of room for optimization
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Steading = require('../classes/Steading');
@@ -30,6 +31,10 @@ var MapDragon = React.createClass({
     var context = this.refs.canvas.getContext('2d');
     this.setState({
       ctx: context,
+      dragoffx: 0,
+      dragoffy: 0,
+      selection: null,
+      dragging: false,
       valid: false
     });
   },
@@ -39,7 +44,49 @@ var MapDragon = React.createClass({
     console.log(mouse);
     return mouse;
   },
-  handleDoubleClick: function(e){
+  onMouseDown: function(e){
+    //TODO clicking on a steading should move it to the end of the array
+    var mouse = mousePosition(e);
+    var mx = mouse.x;
+    var my = mouse.y;
+    var steadings = this.state.steadings;
+    for (var i = steadings.length-1; i >= 0; i--) {
+      if (steadings[i].contains(mx, my)) {
+        var mySel = steadings[i];
+        // Keep track of where in the object we clicked
+        // so we can move it smoothly (see mousemove)
+        this.setState({
+          dragoffx: mx - mySel.x,
+          dragoffy: my - mySel.y,
+          selection: mySel,
+          dragging: true,
+          valid: false
+        });
+        return;
+      }
+    }
+  },
+  onMouseMove: function(e){
+    if (this.state.dragging){
+      var mouse = mousePosition(e);
+      // We don't want to drag the object by its top-left corner, we want to drag it
+      // from where we clicked. Thats why we saved the offset and use it here
+      var selection = this.state.selection;
+      selection.x = mouse.x - this.state.dragoffx;
+      selection.y = mouse.y - this.state.dragoffy;
+      this.setState({
+        valid: false
+      });
+    }
+  },
+  onMouseUp: function(e){
+    this.setState({
+      dragging: false,
+      selection: null,
+      valid: false
+    });
+  },
+  onDoubleClick: function(e){
     e.preventDefault();//is this necessary?  need to prevent text highlighting
     var m = mousePosition(e);
     this.refs.popup.show(m.x, m.y);
@@ -69,10 +116,10 @@ var MapDragon = React.createClass({
 
       // draw selection
       // right now this is just a stroke along the edge of the selected image
-      if (this.selection != null) {
+      if (this.state.selection != null) {
         ctx.strokeStyle = this.selectionColor;
         ctx.lineWidth = this.selectionWidth;
-        var mySel = this.selection;
+        var mySel = this.state.selection;
         ctx.strokeRect(mySel.x,mySel.y,mySel.width,mySel.width);
       }
 
@@ -88,7 +135,13 @@ var MapDragon = React.createClass({
       <div>
         <h2>double-click to add icons to the canvas</h2>
         <div id="canvas-container">
-          <canvas onDoubleClick={this.handleDoubleClick} width="500" height="500" ref="canvas" />
+          <canvas
+            ref="canvas"
+            onMouseDown={this.onMouseDown}
+            onMouseMove={this.onMouseMove}
+            onMouseUp={this.onMouseUp}
+            onDoubleClick={this.onDoubleClick}
+            width="500" height="500" />
           <Popup ref="popup"/>
         </div>
       </div>
