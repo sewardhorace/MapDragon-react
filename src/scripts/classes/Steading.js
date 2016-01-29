@@ -12,6 +12,7 @@ function Steading(steading) {
   this.name = steading.name || "";
 }
 
+//TODO these are super imprecise
 Steading.prototype.namePosX = function(){
   return this.x+this.width/2-this.name.length*3;
 }

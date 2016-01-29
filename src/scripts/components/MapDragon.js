@@ -10,11 +10,12 @@ var SetIntervalMixin = require('../classes/helpers').SetIntervalMixin;
 //components
 var Popup = require('./Popup');
 
+var spriteSheet = new Image();
+spriteSheet.src = 'static/assets/images/cowboyspritestrip.png';
+
 var MapDragon = React.createClass({
   mixins: [SetIntervalMixin],
   getInitialState: function(){
-    var spriteSheet = new Image();
-    spriteSheet.src = 'static/assets/images/cowboyspritestrip.png';
     var steading = new Steading({
       x: 60,
       y: 140,
@@ -35,6 +36,19 @@ var MapDragon = React.createClass({
       dragoffy: 0,
       selection: null,
       dragging: false,
+      valid: false
+    });
+  },
+  addSteading: function(options){
+    var steading = new Steading({
+      x: options.x,
+      y: options.y,
+      img: spriteSheet,
+      name: options.title,
+      width: 64
+    });
+    this.setState({
+      steadings: this.state.steadings.concat([steading]),
       valid: false
     });
   },
@@ -108,14 +122,13 @@ var MapDragon = React.createClass({
       var l = steadings.length;
       for (var i = 0; i < l; i++) {
         var steading = steadings[i];
-        // We can skip the drawing of elements that have moved off the screen:
+        // don't draw elements that have moved off the screen:
         if (steading.x > this.refs.canvas.width || steading.y > this.refs.canvas.height ||
             steading.x + steading.width < 0 || steading.y + steading.width < 0) continue;
         steadings[i].draw(ctx);
       }
 
-      // draw selection
-      // right now this is just a stroke along the edge of the selected image
+      // highlight the selected steading
       if (this.state.selection != null) {
         ctx.strokeStyle = this.selectionColor;
         ctx.lineWidth = this.selectionWidth;
@@ -142,7 +155,7 @@ var MapDragon = React.createClass({
             onMouseUp={this.onMouseUp}
             onDoubleClick={this.onDoubleClick}
             width="500" height="500" />
-          <Popup ref="popup"/>
+          <Popup ref="popup" addSteading={this.addSteading}/>
         </div>
       </div>
     );

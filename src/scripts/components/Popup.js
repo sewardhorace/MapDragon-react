@@ -34,6 +34,12 @@ var Popup = React.createClass({
   },
   addSteadingButtonClicked: function(){
     console.log(this.refs.steadingNameInput.value);
+    this.props.addSteading({
+      x: this.state.x,
+      y: this.state.y,
+      title: this.refs.steadingNameInput.value
+    });
+    this.hide();
   },
   cancelButtonClicked: function(){
     this.hide();
