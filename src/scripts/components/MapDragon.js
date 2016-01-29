@@ -144,6 +144,18 @@ var MapDragon = React.createClass({
     }
   },
   render: function() {
+    var options = [];
+    var spriteWidth = 64;
+    var numSprites = 10;
+    for (var i = 0; i < numSprites; i ++){
+      options.push({
+        img: spriteSheet,
+        offsetX: i*spriteWidth,
+        offsetY: 0,
+        height: spriteWidth,
+        width: spriteWidth
+      });
+    }
     return (
       <div>
         <h2>double-click to add icons to the canvas</h2>
@@ -155,7 +167,10 @@ var MapDragon = React.createClass({
             onMouseUp={this.onMouseUp}
             onDoubleClick={this.onDoubleClick}
             width="500" height="500" />
-          <Popup ref="popup" addSteading={this.addSteading}/>
+          <Popup
+            ref="popup"
+            options={options}
+            addSteading={this.addSteading}/>
         </div>
       </div>
     );

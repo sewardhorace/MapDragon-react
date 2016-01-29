@@ -4,7 +4,7 @@ var ReactDOM = require('react-dom');
 var Popup = React.createClass({
   getInitialState: function(){
     return {
-      options:[],
+      options: this.props.options,
       selectedOptionIdx: -1,
       x: 0,
       y: 0,
@@ -12,7 +12,6 @@ var Popup = React.createClass({
     };
   },
   componentDidMount: function(){
-
   },
   componentDidUpdate: function(prevProps, prevState){
     if (this.state.visible === true){
@@ -50,6 +49,31 @@ var Popup = React.createClass({
       top: this.state.y
     };
     if (this.state.visible) {
+      var options = this.props.options;
+      var popupOptions = [];
+      var frameStyle, imgStyle;
+      for (var i = 0; i < options.length; i ++) {
+        imgStyle = {
+          left: options[i].offsetX * -1,
+          top: options[i].offsetY
+        };
+        frameStyle = {
+          height: options[i].height,
+          width: options[i].width
+        };
+        popupOptions.push(
+          <li key={i} className="popup-item">
+            <div
+              className="popup-icon-frame"
+              style={frameStyle}>
+              <img
+                className="popup-icon-image"
+                style={imgStyle}
+                src={'static/assets/images/cowboyspritestrip.png'}/>
+            </div>
+          </li>
+        );
+      }
       return (
         <div id="popup" style={popupStyle}>
           <div className="popup-nav">
@@ -59,11 +83,7 @@ var Popup = React.createClass({
           </div>
           <div className="popup-window">
             <ul className="popup-options">
-              <li className="popup-item">
-                <div className="popup-icon-frame">
-                  <img className="popup-icon-image"/>
-                </div>
-              </li>
+              {popupOptions}
             </ul>
           </div>
         </div>
