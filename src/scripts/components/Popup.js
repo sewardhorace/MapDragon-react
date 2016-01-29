@@ -31,7 +31,13 @@ var Popup = React.createClass({
       visible: false
     });
   },
+  popupOptionClicked: function(idx) {
+    this.setState({
+      selectedOptionIdx: idx
+    });
+  },
   addSteadingButtonClicked: function(){
+    //TODO dumbo
     console.log(this.refs.steadingNameInput.value);
     this.props.addSteading({
       x: this.state.x,
@@ -61,8 +67,15 @@ var Popup = React.createClass({
           height: options[i].height,
           width: options[i].width
         };
+        var className = "popup-item";
+        if (this.state.selectedOptionIdx === i) {
+          className += " selected";
+        }
         popupOptions.push(
-          <li key={i} className="popup-item">
+          <li
+            className={className}
+            key={i}
+            onClick={this.popupOptionClicked.bind(null, i)} >
             <div
               className="popup-icon-frame"
               style={frameStyle}>
