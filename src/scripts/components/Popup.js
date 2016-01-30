@@ -44,7 +44,7 @@ var Popup = React.createClass({
         y: this.state.y,
         offsetX: option.offsetX,
         offsetY: option.offsetY,
-        title: this.refs.steadingNameInput.value
+        name: this.refs.steadingNameInput.value
       });
       this.refs.steadingNameInput.value = "";
       this.setState({

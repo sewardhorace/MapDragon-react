@@ -57,3 +57,8 @@ gulp.task('images', function(){
   .pipe(image())
   .pipe(gulp.dest('./dist/assets/images'));
 });
+
+gulp.task('mock', function(){
+  return gulp.src('./src/mock/*.json')
+  .pipe(gulp.dest('./dist/mock'));
+});

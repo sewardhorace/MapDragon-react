@@ -4,7 +4,7 @@ var ReactDOM = require('react-dom');
 var Steading = require('../classes/Steading');
 
 //helpers
-var mousePosition = require('../classes/helpers').relativeMousePos;
+var getMouse = require('../classes/helpers').relativeMousePos;
 var SetIntervalMixin = require('../classes/helpers').SetIntervalMixin;
 
 //components
@@ -16,35 +16,32 @@ spriteSheet.src = 'static/assets/images/cowboyspritestrip.png';
 var MapDragon = React.createClass({
   mixins: [SetIntervalMixin],
   getInitialState: function(){
-    var steading = new Steading({
-      x: 60,
-      y: 140,
-      img: spriteSheet,
-      name: "Title",
-      width: 64
-    });
     return {
-      steadings: [steading],
+      steadings: [],
+      ctx: null,
+      dragoffx: 0,
+      dragoffy: 0,
+      selection: null,
+      dragging: false,
+      valid: false
     };
   },
   componentDidMount: function() {
     this.setInterval(this.draw, 30);
     var context = this.refs.canvas.getContext('2d');
     this.setState({
+      steadings: [],
       ctx: context,
-      dragoffx: 0,
-      dragoffy: 0,
-      selection: null,
-      dragging: false,
-      valid: false
     });
   },
   addSteading: function(options){
     var steading = new Steading({
       x: options.x,
       y: options.y,
+      offsetX: options.offsetX,
+      offsetY: options.offsetY,
       img: spriteSheet,
-      name: options.title,
+      name: options.name,
       width: 64
     });
     this.setState({
@@ -52,15 +49,32 @@ var MapDragon = React.createClass({
       valid: false
     });
   },
+  initializeMap: function(rawMap){
+    var rawSteading;
+    var steadings = [];
+    for (var i = 0; i < rawMap.length; i++){
+      rawSteading = rawMap[i];
+      steadings.push(new Steading({
+        x: rawSteading.x,
+        y: rawSteading.y,
+        img: spriteSheet,
+        name: rawSteading.name,
+        width: rawSteading.width
+      }));
+    }
+    this.setState({
+      steadings: steadings
+    });
+  },
   getMouse: function(e){
     //TODO will become redundant.. using for logging purposes now
-    var mouse = mousePosition(e);
+    var mouse = getMouse(e);
     console.log(mouse);
     return mouse;
   },
   onMouseDown: function(e){
     //TODO clicking on a steading should move it to the end of the array
-    var mouse = mousePosition(e);
+    var mouse = getMouse(e);
     var mx = mouse.x;
     var my = mouse.y;
     var steadings = this.state.steadings;
@@ -82,7 +96,7 @@ var MapDragon = React.createClass({
   },
   onMouseMove: function(e){
     if (this.state.dragging){
-      var mouse = mousePosition(e);
+      var mouse = getMouse(e);
       // We don't want to drag the object by its top-left corner, we want to drag it
       // from where we clicked. Thats why we saved the offset and use it here
       var selection = this.state.selection;
@@ -101,15 +115,22 @@ var MapDragon = React.createClass({
     });
   },
   onDoubleClick: function(e){
-    e.preventDefault();//is this necessary?  need to prevent text highlighting
-    var m = mousePosition(e);
-    this.refs.popup.show(m.x, m.y);
+    var mouse = getMouse(e);
+    this.refs.popup.show(mouse.x, mouse.y);
+  },
+  onLoadButtonClick: function(e){
+    e.preventDefault();
+    // this.serverRequest = $.get('static/mock/maps.json', function (result) {
+    //   var lastMap = result[0];
+    //   console.log(result);
+    //   // this.initializeMap(lastMap);
+    // }.bind(this));
+    console.log("load");
   },
   clear: function(){
     this.state.ctx.clearRect(0, 0, this.refs.canvas.width, this.refs.canvas.height);
   },
   draw: function(){
-    // if our state is invalid, redraw and validate!
     if (!this.state.valid) {
       var ctx = this.state.ctx;
       var steadings = this.state.steadings;
@@ -118,7 +139,6 @@ var MapDragon = React.createClass({
       // ** Add stuff you want drawn in the background all the time here **
 
       // draw all steadings
-      //TODO consider steadings.each-type syntax
       var l = steadings.length;
       for (var i = 0; i < l; i++) {
         var steading = steadings[i];
@@ -149,7 +169,6 @@ var MapDragon = React.createClass({
     var numSprites = 10;
     for (var i = 0; i < numSprites; i ++){
       options.push({
-        img: spriteSheet,
         offsetX: i*spriteWidth,
         offsetY: 0,
         height: spriteWidth,
@@ -172,6 +191,11 @@ var MapDragon = React.createClass({
             options={options}
             addSteading={this.addSteading}/>
         </div>
+        <a
+          href=""
+          onClick={this.onLoadButtonClick}>
+          Load Map
+        </a>
       </div>
     );
   }
