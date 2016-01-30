@@ -37,13 +37,20 @@ var Popup = React.createClass({
     });
   },
   addSteadingButtonClicked: function(){
-    //TODO dumbo
-    console.log(this.refs.steadingNameInput.value);
-    this.props.addSteading({
-      x: this.state.x,
-      y: this.state.y,
-      title: this.refs.steadingNameInput.value
-    });
+    if (this.state.selectedOptionIdx > -1){
+      var option = this.state.options[this.state.selectedOptionIdx];
+      this.props.addSteading({
+        x: this.state.x,
+        y: this.state.y,
+        offsetX: option.offsetX,
+        offsetY: option.offsetY,
+        title: this.refs.steadingNameInput.value
+      });
+      this.refs.steadingNameInput.value = "";
+      this.setState({
+        selectedOptionIdx: -1
+      });
+    }
     this.hide();
   },
   cancelButtonClicked: function(){
