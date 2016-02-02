@@ -155,9 +155,9 @@ var MapDragon = React.createClass({
   },
   onLoadButtonClick: function(e){
     e.preventDefault();
-    this.serverRequest = $.get('/maps', function (result) {
-      console.log(result)
-      var lastMap = result[0];
+    this.serverRequest = $.get('/maps', function (results) {
+      console.log(results)
+      var lastMap = results[results.length-1];
       this.initializeMap(lastMap);
     }.bind(this));
     console.log("ajax get request sent");
