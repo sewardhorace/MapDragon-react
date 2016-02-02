@@ -2,6 +2,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Steading = require('../classes/Steading');
+var $ = require('jquery');
 
 //helpers
 var getMouse = require('../classes/helpers').relativeMousePos;
@@ -52,8 +53,8 @@ var MapDragon = React.createClass({
   initializeMap: function(rawMap){
     var rawSteading;
     var steadings = [];
-    for (var i = 0; i < rawMap.length; i++){
-      rawSteading = rawMap[i];
+    for (var i = 0; i < rawMap.steadings.length; i++){
+      rawSteading = rawMap.steadings[i];
       steadings.push(new Steading({
         x: rawSteading.x,
         y: rawSteading.y,
@@ -63,17 +64,29 @@ var MapDragon = React.createClass({
       }));
     }
     this.setState({
-      steadings: steadings
+      steadings: steadings,
+      valid: false
     });
   },
-  getMouse: function(e){
-    //TODO will become redundant.. using for logging purposes now
-    var mouse = getMouse(e);
-    console.log(mouse);
-    return mouse;
+  getMapAsJSON: function (){
+    var map = this.state.steadings;
+    var rawMap = [];
+    var steading;
+    for (var i = 0; i < map.length; i++ ){
+      steading = map[i];
+      rawMap.push({
+        "name": steading.name,
+        "offsetX": steading.offsetX,
+        "offsetY": steading.offsetY,
+        "width": steading.width,
+        "x": steading.x,
+        "y": steading.y
+      });
+    }
+    return rawMap;
   },
   onMouseDown: function(e){
-    //TODO clicking on a steading should move it to the end of the array
+    //TODO clicking on a steading should move it to the end of the array (so it is moved to the front when drawing)
     var mouse = getMouse(e);
     var mx = mouse.x;
     var my = mouse.y;
@@ -118,14 +131,36 @@ var MapDragon = React.createClass({
     var mouse = getMouse(e);
     this.refs.popup.show(mouse.x, mouse.y);
   },
+  onSaveButtonClick: function(e){
+    e.preventDefault();
+    var rawMap = this.getMapAsJSON(this.state.steadings);
+    var data = JSON.stringify({
+      "map":{
+        "name":"My Map",
+        "steadings":rawMap
+      }
+    });
+    this.serverRequest = $.ajax({
+      type: "POST",
+      url: "/maps",
+      data: data,
+      success: function(res){
+        console.log(res);
+        //this isn't doing anything...(?)
+      },
+      dataType: "json",
+      contentType: "application/json",
+    });
+    console.log("ajax post request sent");
+  },
   onLoadButtonClick: function(e){
     e.preventDefault();
-    // this.serverRequest = $.get('static/mock/maps.json', function (result) {
-    //   var lastMap = result[0];
-    //   console.log(result);
-    //   // this.initializeMap(lastMap);
-    // }.bind(this));
-    console.log("load");
+    this.serverRequest = $.get('/maps', function (result) {
+      console.log(result)
+      var lastMap = result[0];
+      this.initializeMap(lastMap);
+    }.bind(this));
+    console.log("ajax get request sent");
   },
   clear: function(){
     this.state.ctx.clearRect(0, 0, this.refs.canvas.width, this.refs.canvas.height);
@@ -191,6 +226,11 @@ var MapDragon = React.createClass({
             options={options}
             addSteading={this.addSteading}/>
         </div>
+        <a
+          href=""
+          onClick={this.onSaveButtonClick}>
+          Save Map
+        </a>
         <a
           href=""
           onClick={this.onLoadButtonClick}>
