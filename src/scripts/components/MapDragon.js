@@ -140,7 +140,7 @@ var MapDragon = React.createClass({
         "steadings":rawMap
       }
     });
-    this.serverRequest = $.ajax({
+    $.ajax({
       type: "POST",
       url: "/maps",
       data: data,
@@ -155,7 +155,7 @@ var MapDragon = React.createClass({
   },
   onLoadButtonClick: function(e){
     e.preventDefault();
-    this.serverRequest = $.get('/maps', function (results) {
+    $.get('/maps', function (results) {
       console.log(results)
       var lastMap = results[results.length-1];
       this.initializeMap(lastMap);
