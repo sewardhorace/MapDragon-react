@@ -18,7 +18,11 @@ var MapDragon = React.createClass({
   mixins: [SetIntervalMixin],
   getInitialState: function(){
     return {
-      steadings: [],
+      map:{
+        name: null,
+        steadings: [],
+        _id: null
+      },
       ctx: null,
       dragoffx: 0,
       dragoffy: 0,
@@ -31,7 +35,6 @@ var MapDragon = React.createClass({
     this.setInterval(this.draw, 30);
     var context = this.refs.canvas.getContext('2d');
     this.setState({
-      steadings: [],
       ctx: context,
     });
   },
@@ -46,11 +49,14 @@ var MapDragon = React.createClass({
       width: 64
     });
     this.setState({
-      steadings: this.state.steadings.concat([steading]),
+      map: {
+        steadings: this.state.steadings.concat([steading])
+      },
       valid: false
     });
   },
   initializeMap: function(rawMap){
+    console.log(rawMap);
     var rawSteading;
     var steadings = [];
     for (var i = 0; i < rawMap.steadings.length; i++){
@@ -64,17 +70,23 @@ var MapDragon = React.createClass({
       }));
     }
     this.setState({
-      steadings: steadings,
+      map: {
+        name:rawMap.name,
+        steadings:steadings,
+        _id: rawMap._id
+      },
       valid: false
     });
   },
   getMapAsJSON: function (){
-    var map = this.state.steadings;
-    var rawMap = [];
+    var map = this.state.map;
+    var rawMap = {
+      steadings:[]
+    };
     var steading;
-    for (var i = 0; i < map.length; i++ ){
-      steading = map[i];
-      rawMap.push({
+    for (var i = 0; i < map.steadings.length; i++ ){
+      steading = map.steadings[i];
+      rawMap.steadings.push({
         "name": steading.name,
         "offsetX": steading.offsetX,
         "offsetY": steading.offsetY,
@@ -83,6 +95,8 @@ var MapDragon = React.createClass({
         "y": steading.y
       });
     }
+    rawMap.name = map.name;
+    rawMap._id = map._id;
     return rawMap;
   },
   onMouseDown: function(e){
@@ -90,7 +104,7 @@ var MapDragon = React.createClass({
     var mouse = getMouse(e);
     var mx = mouse.x;
     var my = mouse.y;
-    var steadings = this.state.steadings;
+    var steadings = this.state.map.steadings;
     for (var i = steadings.length-1; i >= 0; i--) {
       if (steadings[i].contains(mx, my)) {
         var mySel = steadings[i];
@@ -133,13 +147,8 @@ var MapDragon = React.createClass({
   },
   onSaveButtonClick: function(e){
     e.preventDefault();
-    var rawMap = this.getMapAsJSON(this.state.steadings);
-    var data = JSON.stringify({
-      "map":{
-        "name":"My Map",
-        "steadings":rawMap
-      }
-    });
+    var rawMap = this.getMapAsJSON(this.state.map);
+    var data = JSON.stringify(rawMap);
     $.ajax({
       type: "POST",
       url: "/maps",
@@ -151,16 +160,21 @@ var MapDragon = React.createClass({
       dataType: "json",
       contentType: "application/json",
     });
-    console.log("ajax post request sent");
+    console.log("ajax POST request sent");
   },
   onLoadButtonClick: function(e){
     e.preventDefault();
-    $.get('/maps', function (results) {
-      console.log(results)
-      var lastMap = results[results.length-1];
-      this.initializeMap(lastMap);
-    }.bind(this));
-    console.log("ajax get request sent");
+    $.ajax({
+      type: "GET",
+      url: "/maps",
+      success: function (results) {
+        console.log(results)
+        var lastMap = results[results.length-1];
+        console.log(lastMap);
+        this.initializeMap(lastMap);
+      }.bind(this)
+    });
+    console.log("ajax GET request sent");
   },
   clear: function(){
     this.state.ctx.clearRect(0, 0, this.refs.canvas.width, this.refs.canvas.height);
@@ -168,7 +182,7 @@ var MapDragon = React.createClass({
   draw: function(){
     if (!this.state.valid) {
       var ctx = this.state.ctx;
-      var steadings = this.state.steadings;
+      var steadings = this.state.map.steadings;
       this.clear();
 
       // ** Add stuff you want drawn in the background all the time here **
