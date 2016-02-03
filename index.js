@@ -23,8 +23,11 @@ app.post('/maps', function(req, res) {
   .on('complete', function(err, doc){
     if (err) {
       console.log("Error: " + err);
+      res.send(err);
     } else {
-      console.log("Complete: " + doc);
+      console.log("Complete: ");
+      console.log(doc);
+      res.send("saved! " + doc);
     }
   });
 });
@@ -36,7 +39,7 @@ app.get('/maps', function(req, res){
       console.log("Error: " + err);
       res.send(err);
     } else {
-      console.log("Complete: " + docs);
+      console.log("Complete: ");
       console.log(docs);
       res.send(docs);
     }

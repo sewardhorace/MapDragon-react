@@ -50,13 +50,12 @@ var MapDragon = React.createClass({
     });
     this.setState({
       map: {
-        steadings: this.state.steadings.concat([steading])
+        steadings: this.state.map.steadings.concat([steading])
       },
       valid: false
     });
   },
   initializeMap: function(rawMap){
-    console.log(rawMap);
     var rawSteading;
     var steadings = [];
     for (var i = 0; i < rawMap.steadings.length; i++){
@@ -97,7 +96,10 @@ var MapDragon = React.createClass({
     }
     rawMap.name = map.name;
     rawMap._id = map._id;
-    return rawMap;
+
+    return JSON.stringify({
+      "map": rawMap
+    });
   },
   onMouseDown: function(e){
     //TODO clicking on a steading should move it to the end of the array (so it is moved to the front when drawing)
@@ -147,15 +149,13 @@ var MapDragon = React.createClass({
   },
   onSaveButtonClick: function(e){
     e.preventDefault();
-    var rawMap = this.getMapAsJSON(this.state.map);
-    var data = JSON.stringify(rawMap);
+    var data = this.getMapAsJSON(this.state.map);
     $.ajax({
       type: "POST",
       url: "/maps",
       data: data,
       success: function(res){
         console.log(res);
-        //this isn't doing anything...(?)
       },
       dataType: "json",
       contentType: "application/json",
@@ -168,9 +168,8 @@ var MapDragon = React.createClass({
       type: "GET",
       url: "/maps",
       success: function (results) {
-        console.log(results)
+        console.log("success!");
         var lastMap = results[results.length-1];
-        console.log(lastMap);
         this.initializeMap(lastMap);
       }.bind(this)
     });
