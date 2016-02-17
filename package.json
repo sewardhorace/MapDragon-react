@@ -25,7 +25,7 @@
     "body-parser": "^1.14.2",
     "express": "^4.13.4",
     "jquery": "^2.2.0",
-    "mongodb": "^2.1.4",
+    "mongodb": "^1.4.40",
     "monk": "^1.0.1",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
