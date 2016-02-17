@@ -1,8 +1,8 @@
 //TODO lots of room for optimization
 var React = require('react');
 var ReactDOM = require('react-dom');
-var Steading = require('../classes/Steading');
 var $ = require('jquery');
+var Steading = require('../classes/Steading');
 
 //helpers
 var getMouse = require('../classes/helpers').relativeMousePos;
@@ -10,6 +10,7 @@ var SetIntervalMixin = require('../classes/helpers').SetIntervalMixin;
 
 //components
 var Popup = require('./Popup');
+var Nav = require('./Nav');
 
 var spriteSheet = new Image();
 spriteSheet.src = 'static/assets/images/cowboyspritestrip.png';
@@ -226,6 +227,7 @@ var MapDragon = React.createClass({
     return (
       <div>
         <h2>double-click to add icons to the canvas</h2>
+        <Nav />
         <div id="canvas-container">
           <canvas
             ref="canvas"

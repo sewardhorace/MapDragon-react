@@ -57,10 +57,6 @@ var Popup = React.createClass({
     this.hide();
   },
   render: function() {
-    var popupStyle = {
-      left: this.state.x,
-      top: this.state.y
-    };
     if (this.state.visible) {
       var options = this.props.options;
       var popupOptions = [];
@@ -94,6 +90,10 @@ var Popup = React.createClass({
           </li>
         );
       }
+      var popupStyle = {
+        left: this.state.x,
+        top: this.state.y
+      };
       return (
         <div id="popup" style={popupStyle}>
           <div className="popup-nav">
